@@ -18,8 +18,7 @@
                     </div>
                     <div class="form-group">
                         <label for="type">Media</label>
-                        <input type="file" name="type" id="type" class="form-control"
-                            placeholder="Masukan media...">
+                        <input type="file" name="type" id="type" class="form-control">
                         <input type="hidden" name="status_izin" id="status_izin" class="form-control" value="pending">
                     </div>
                     <div class="form-group">

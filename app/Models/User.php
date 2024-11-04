@@ -35,7 +35,7 @@ class User extends Authenticatable
     }
 
     // satu user memiliki/bisa upload lebih dari 1 file
-    public function medias()
+    public function media()
     {
         return $this->hasMany(Media::class);
     }

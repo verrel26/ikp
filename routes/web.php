@@ -42,7 +42,7 @@ Route::middleware('auth')->group(function () {
         Route::get('', 'index')->name('media.index');
         Route::get('data', 'data')->name('media.data');
         Route::post('store', 'store')->name('media.store');
-        Route::put('update/{id}', 'update')->name('media.update');
+        Route::put('update', 'update')->name('media.update');
         Route::delete('delete', 'delete')->name('media.delete');
         Route::get('{id}/detail', 'detail')->name('media.detail');
         Route::get('approve', 'approve')->name('media.approve');
