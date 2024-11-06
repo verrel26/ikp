@@ -17,8 +17,8 @@
                             placeholder="Masukan file..." required>
                     </div>
                     <div class="form-group">
-                        <label for="type">Media</label>
-                        <input type="file" name="type" id="type" class="form-control">
+                        <label>Media</label>
+                        <input type="file" name="type[]" id="type[]" multiple class="form-control">
                         <input type="hidden" name="status_izin" id="status_izin" class="form-control" value="pending">
                     </div>
                     <div class="form-group">

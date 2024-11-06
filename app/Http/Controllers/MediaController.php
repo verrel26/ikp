@@ -6,26 +6,37 @@ use Illuminate\Http\Request;
 use App\Http\Requests\UpdateMediaRequest;
 use Yajra\DataTables\DataTables;
 use App\Models\Media;
+use App\Models\Permission;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
+class Status
+{
+    const approve = true;
+}
 
 class MediaController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('auth');
-    // }
-
     public function index()
     {
-        $data = Media::with('user')->get();
-        // dd($data);
-        return view('admin.media.index', compact('data'));
+
+        return view('admin.media.index');
     }
 
     public function data()
     {
-        $data = Media::with('user')->get();
-        return DataTables::of($data)->addIndexColumn()->make(true);
+        $userId = Auth::id();
+
+        // Jika pengguna adalah admin (user_id = 1), ambil semua data media
+        if ($userId == 1) {
+            $mediaItems = Media::with('user')->get();
+        } else {
+            // Jika bukan admin, ambil data media yang diupload oleh pengguna yang sedang login
+            $mediaItems = Media::with('user')->where('user_id', $userId)->get();
+        }
+
+        // Menggunakan DataTables untuk mengembalikan data
+        return DataTables::of($mediaItems)->addIndexColumn()->make(true);
     }
 
 
@@ -34,36 +45,50 @@ class MediaController extends Controller
 
     public function store(Request $request)
     {
-        // $request->validateData([
-        //     'file' => 'required|string',
-        //     'type' => 'required|file|mines:jpg,jpeg,png,pdf,doc,docx',
-        // ]);
+        try {
+            $this->validateData($request);
+            $checkFile = Media::where('file', $request->file)->first();
+            if ($checkFile) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File' . $request->file . 'already exists'
+                ]);
+            }
+            foreach ($request->file('type') as $files) {
+                $fileName = time() . '_' . $files->getClientOriginalName();
+                $filePath = $files->storeAs('uploads', $fileName, 'public');
+            }
 
-        if ($request->hasFile('type')) {
-            $type = $request->file('type');
-            $typeName = time() .  '_' . $type->getClientOriginalName();
-            $typePath = $type->storeAs('uploads', $typeName, 'public');
-        } else {
-            return back()->with('error', 'File is required');
+            $data = new Media();
+            $data->file = $request->file;
+            $data->user_id = auth()->user()->id;
+            $data->type = $files->extension();
+            $data->file_path = $filePath;
+            $data->status_izin = 'pending';
+
+            $data->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Media' . $data->media . ' created successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
         }
-
-        $data = new Media();
-        $data->file = $request->file;
-        $data->user_id = auth()->user()->id;
-        $data->type = $typeName;
-        $data->file_path = $typePath;
-        $data->status_izin = 'pending';
-
-        $data->save();
-
-        return redirect()->back()->with('success', 'Data berhasil ditambahkan!');
     }
 
 
 
-    public function show(Media $media)
+    public function detail(Request $request, $id)
     {
-        //
+        $media = Media::where('id', $id)->firstOrFail();
+        $requestCount = Permission::where('media_id', $id)->count();
+
+        $requests = Permission::where('media_id', $id)->where('is_approved', 'pending')->with('requester')->get();
+        return view('admin.media.detail', compact('media', 'requestCount', 'requests'));
     }
 
 
@@ -73,23 +98,119 @@ class MediaController extends Controller
     }
 
 
-    public function update(UpdateMediaRequest $request, Media $media)
+    public function update(Request $request, $id) {}
+
+
+    public function delete(Request $request)
     {
-        //
+        try {
+            $media = Media::findOrFail($request->id);
+            $media->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil menghapus media',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function approve(Request $request)
+    {
+        try {
+            $media = Media::find($request->id);
+
+            $media->status_izin = true;
+
+            $media->save();
+            return response()->json([
+                'success' => true,
+                'messages' => 'Media has been updated',
+                'data' => $media
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'messages' => $e->getMessage()
+            ]);
+        }
     }
 
 
-    public function destroy(Media $media)
+    // mengajukan download file 
+    public function requestPermission($fileId)
     {
-        //
+        // File yang mau didownload
+        $file = Media::findOrFail($fileId);
+        // user yang ingin mendownload
+        $requestId = Auth::id();
+
+        // cek apakah sudah mengajukan sebelumnya
+        $cekRequest = Permission::where('media_id', $fileId)
+            ->where('user_id', $requestId)
+            ->first();
+
+        if ($cekRequest) {
+            return redirect()->back()->with('error', 'Anda sudah mengajukan permintaan');
+        }
+
+        Permission::create([
+            'media_id' => $file,
+            'user_id' => $requestId,
+            'owner_id' => $file->user_id
+
+        ]);
+        return redirect()->back()->with('success', 'Permintaan berhasil di ajukan');
     }
+
+    // daftar yang ingin download 
+    public function viewPermissionRequest()
+    {
+        $requests = Permission::with(['file', 'requester'])->where('owner_id', Auth::id())->get();
+        return view('admin.media.index', compact('requests'));
+    }
+
+    // approved success
+    public function approveRequest($id)
+    {
+        $request = Permission::findOrFail($id);
+        $request->is_approved = true;
+        $request->save();
+
+        return redirect()->back()->with('success', 'Permintaan izin berhasil disetujui');
+    }
+
+
+    // approved tolak
+    public function deliceRequest($id)
+    {
+        $request = Permission::findOrFail($id);
+        $request->delete();
+        return redirect()->back()->with('success', 'Permintaan izin berhasil ditolak');
+    }
+
+    // Share File
+    public function shareFile($id)
+    {
+        $mediaShare = Media::findOrFail($id);
+        $mediaShare->status_izin = true;
+        $mediaShare->save();
+        return redirect()->back()->with('success', 'Permintaan izin berhasil ditolak');
+        // return redirect()->route('media.detail', $id)->with('success', 'File telah dibagikan secara publik.');
+    }
+
 
 
     private function validateData($request)
     {
         return $request->validate([
             'file' => 'required|string|max:255',
-            'type' => 'required|',
+            'type' => 'required',
+            'type.*' => 'file|mimes:jpeg,png,jpg,gif,svg,doc,docx,pdf,txt|max:2048',
             'file_path' => 'required|string|max:255',
             'status_izin' => 'required|string|max:255'
         ], [

@@ -6,17 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+
     public function up(): void
     {
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
             // menyimpan data dari table media
             $table->unsignedBigInteger('media_id');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('owner_id');
             // menyimpan status untuk file yang di upload/didownload (pending,approved,reject)
-            $table->string('status');
+            $table->boolean('is_approved')->default(false);
+            $table->foreign('media_id')->references('id')->on('medias')->onDelete('restrict')->onUpdate('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict')->onUpdate('cascade');
+            $table->foreign('owner_id')->references('id')->on('users')->onDelete('restrict')->onUpdate('cascade');
             $table->timestamps();
         });
     }

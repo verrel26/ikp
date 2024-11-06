@@ -10,7 +10,11 @@
     <script src="{{ asset('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('dist/js/adminlte.min.js?v=3.2.0') }}"></script>
-
+    <script>
+        function initializeDataTable(table, config) {
+            table.DataTable(config)
+        }
+    </script>
     <script>
         toastr.options = {
             "closeButton": false,

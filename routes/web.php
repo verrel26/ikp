@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PermissionController;
@@ -9,9 +10,10 @@ use Illuminate\Support\Facades\Route;
 
 
 // Home
-Route::middleware('guest')->get('/', function () {
-    return view('welcome');
-});
+// Route::middleware('guest')->get('/', function () {
+//     return view('welcome');
+// });
+Route::get('/', [HomeController::class, 'index']);
 
 
 
@@ -27,7 +29,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
 
     // Home
-    Route::get('/home', [HomeController::class, 'home']);
+    Route::get('/home', [DashboardController::class, 'home']);
 
     // User
     Route::controller(UserController::class)->prefix('users')->group(function () {
@@ -46,6 +48,12 @@ Route::middleware('auth')->group(function () {
         Route::delete('delete', 'delete')->name('media.delete');
         Route::get('{id}/detail', 'detail')->name('media.detail');
         Route::get('approve', 'approve')->name('media.approve');
+        Route::post('requestPermission/{id}', 'requestPermission')->name('media.requestPermission');
+        Route::post('approveRequest/{id}', 'approveRequest')->name('media.approveRequest');
+        Route::post('deliceRequest/{id}', 'deliceRequest')->name('media.deliceRequest');
+
+        // Share File
+        Route::post('shareFile/{id}', 'shareFile')->name('media.shareFile');
     });
     // Permission
     Route::controller(PermissionController::class)->prefix('permissions')->group(function () {
