@@ -19,7 +19,7 @@ use App\Http\Controllers\RoleController;
 // Route::get('/login', [LoginController::class, 'index'])->name('login');
 // Route::post('/login', [LoginController::class, 'authenticate']);
 // Route::get('/auth/register', [RegisterController::class, 'index']);
-// Route::post('/auth/register', [RegisterController::class, 'store']);
+// Route::post('/auth/`register', [RegisterController::class, 'store']);
 
 Auth::routes();
 
