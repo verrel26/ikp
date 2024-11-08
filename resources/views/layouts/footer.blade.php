@@ -1,7 +1,4 @@
 <footer id="footer" class="footer">
-
-
-
     <div class="container footer-top">
         <div class="row gy-4">
             <div class="col-lg-4 col-md-6 footer-about">
@@ -58,14 +55,14 @@
 <div id="preloader"></div>
 
 <!-- Vendor JS Files -->
-<script src="{{ 'assets2/vendor/bootstrap/js/bootstrap.bundle.min.js' }}"></script>
-<script src="{{ 'assets2/vendor/php-email-form/validate.js' }}"></script>
-<script src="{{ 'assets2/vendor/aos/aos.js' }}"></script>
-<script src="{{ 'assets2/vendor/glightbox/js/glightbox.min.js' }}"></script>
-<script src="{{ 'assets2/vendor/swiper/swiper-bundle.min.js' }}"></script>
-<script src="{{ 'assets2/vendor/waypoints/noframework.waypoints.js' }}"></script>
-<script src="{{ 'assets2/vendor/imagesloaded/imagesloaded.pkgd.min.js' }}"></script>
-<script src="{{ 'assets2/vendor/isotope-layout/isotope.pkgd.min.js' }}"></script>
+<script src="{{ asset('assets2/vendor/aos/aos.js') }}"></script>
+<script src="{{ asset('assets2/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('assets2/vendor/glightbox/js/glightbox.min.js') }}"></script>
+<script src="{{ asset('assets2/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+<script src="{{ asset('assets2/vendor/swiper/swiper-bundle.min.js') }}"></script>
+<script src="{{ asset('assets2/vendor/waypoints/noframework.waypoints.js') }}"></script>
+<script src="{{ asset('assets2/vendor/php-email-form/validate.js') }}"></script>
 
-<!-- Main JS File -->
-<script src="{{ 'assets2/js/main.js' }}"></script>
+<!-- Template Main JS File -->
+<script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
+<script src="{{ asset('assets2/js/main.js') }}"></script>

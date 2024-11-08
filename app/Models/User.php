@@ -39,4 +39,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Media::class);
     }
+
+    // Relasi Permission / Download 
+    public function downloadReq()
+    {
+        $this->hasMany(Permission::class);
+    }
 }

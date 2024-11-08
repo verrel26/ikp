@@ -47,30 +47,48 @@ class MediaController extends Controller
     {
         try {
             $this->validateData($request);
+
+            // Periksa apakah nama file sudah ada
             $checkFile = Media::where('file', $request->file)->first();
             if ($checkFile) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'File' . $request->file . 'already exists'
+                    'message' => 'File ' . $request->file . ' already exists'
                 ]);
             }
+
+            // Proses setiap file berdasarkan tipe
             foreach ($request->file('type') as $files) {
+                $fileExtension = $files->extension();
                 $fileName = time() . '_' . $files->getClientOriginalName();
-                $filePath = $files->storeAs('uploads', $fileName, 'public');
+
+                // Tentukan folder berdasarkan jenis file
+                if (in_array($fileExtension, ['jpg', 'jpeg', 'png'])) {
+                    $folder = 'uploads/gambar';
+                } elseif (in_array($fileExtension, ['mp4', 'avi', 'mov'])) {
+                    $folder = 'uploads/video';
+                } elseif (in_array($fileExtension, ['pdf', 'doc', 'docx'])) {
+                    $folder = 'uploads/document';
+                } else {
+                    $folder = 'uploads/others';
+                }
+
+                // Simpan file ke dalam folder yang sesuai
+                $filePath = $files->storeAs($folder, $fileName, 'public');
+
+                // Simpan data file ke database
+                $data = new Media();
+                $data->file = $request->file;
+                $data->user_id = auth()->user()->id;
+                $data->type = $fileExtension;
+                $data->file_path = $filePath;
+                $data->status_izin = 'pending';
+                $data->save();
             }
-
-            $data = new Media();
-            $data->file = $request->file;
-            $data->user_id = auth()->user()->id;
-            $data->type = $files->extension();
-            $data->file_path = $filePath;
-            $data->status_izin = 'pending';
-
-            $data->save();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Media' . $data->media . ' created successfully'
+                'message' => 'Media ' . $data->file . ' created successfully'
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -82,6 +100,7 @@ class MediaController extends Controller
 
 
 
+
     public function detail(Request $request, $id)
     {
         $media = Media::where('id', $id)->firstOrFail();
@@ -89,6 +108,45 @@ class MediaController extends Controller
 
         $requests = Permission::where('media_id', $id)->where('is_approved', 'pending')->with('requester')->get();
         return view('admin.media.detail', compact('media', 'requestCount', 'requests'));
+    }
+
+
+    // fungsi request download 
+    public function reqDownload($mediaId)
+    {
+        $media = Media::find($mediaId);
+        $user = auth()->user();
+
+        // cek apakah user sudah pernah mengajukan sebelumnya
+        $cekReq = Permission::where('user_id', $user->id)
+            ->where('media_id', $mediaId)
+            ->first();
+
+        if ($cekReq) {
+            return back()->with('error', 'anda telah mengajukan download file ini!');
+        }
+
+        //  Membuat req download baru
+        Permission::create([
+            'user_id' => $user->id,
+            'media_id' => $mediaId,
+            'is_approved' => Permission::STATUS_PENDING,
+        ]);
+
+        return back()->with('success', 'anda berhasil mengajukan download file!');
+    }
+
+    // fungsi tampil request download
+    public function showReq($mediaId)
+    {
+        $media = Media::find($mediaId);
+
+        //hanya pengupload yang bisa mengakses halaman ini
+        // $this->authorize('view', $media);
+
+        // $request = $media->downloadRequests;
+
+        // return view('admin.media.detail')
     }
 
 
@@ -210,7 +268,7 @@ class MediaController extends Controller
         return $request->validate([
             'file' => 'required|string|max:255',
             'type' => 'required',
-            'type.*' => 'file|mimes:jpeg,png,jpg,gif,svg,doc,docx,pdf,txt|max:2048',
+            'type.*' => 'file|mimes:jpeg,png,jpg,gif,svg,doc,docx,pdf,txt,mp4,mov,avi|max:2048',
             'file_path' => 'required|string|max:255',
             'status_izin' => 'required|string|max:255'
         ], [

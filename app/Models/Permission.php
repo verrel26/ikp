@@ -13,23 +13,21 @@ class Permission extends Model
         'is_approved',
     ];
 
+    const STATUS_PENDING = 'pending';
+    const STATUS_APPROVED = 'approved';
+    const STATUS_DENIED = 'denied';
 
-    // Relasi ke media
-    public function file()
-    {
-        return $this->belongsTo(Media::class, 'file_id');
-    }
 
     // Relas ke user (peminta file)
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 
 
-    // Mengambil data user yang punya file
-    public function owner()
+    // Relasi ke media
+    public function media()
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(Media::class);
     }
 }

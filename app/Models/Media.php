@@ -15,8 +15,16 @@ class Media extends Model
         'status_izin',
     ];
 
+
+    // Relasi User
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // relasi model download
+    public function downloadReq()
+    {
+        return $this->hasMany(Permission::class);
     }
 }
