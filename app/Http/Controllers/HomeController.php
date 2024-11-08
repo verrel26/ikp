@@ -26,4 +26,11 @@ class HomeController extends Controller
         // dd($media);
         return view('detailHome', compact('media'));
     }
+
+    public function files()
+    {
+        $data = Media::all();
+
+        dd($data);
+    }
 }
