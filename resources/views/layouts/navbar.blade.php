@@ -21,6 +21,9 @@
 
         <!-- Tampilkan Tombol Logout jika sudah login -->
         @auth
+        <span>
+            {{ Auth::user()->name }}
+        </span>
             <a class="btn-getstarted" href="#"
                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

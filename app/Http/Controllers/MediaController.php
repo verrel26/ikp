@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateMediaRequest;
 use Yajra\DataTables\DataTables;
 use App\Models\Media;
 use App\Models\Permission;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -19,29 +20,16 @@ class MediaController extends Controller
 {
     public function index()
     {
-
         return view('admin.media.index');
     }
 
     public function data()
     {
-        $userId = Auth::id();
-
-        // Jika pengguna adalah admin (user_id = 1), ambil semua data media
-        if ($userId == 1) {
-            $mediaItems = Media::with('user')->get();
-        } else {
-            // Jika bukan admin, ambil data media yang diupload oleh pengguna yang sedang login
-            $mediaItems = Media::with('user')->where('user_id', $userId)->get();
-        }
-
-        // Menggunakan DataTables untuk mengembalikan data
+        $mediaItems = Media::with('user')->get();
         return DataTables::of($mediaItems)->addIndexColumn()->make(true);
     }
 
-
     public function create() {}
-
 
     public function store(Request $request)
     {
@@ -98,16 +86,29 @@ class MediaController extends Controller
         }
     }
 
-
-
-
     public function detail(Request $request, $id)
     {
-        $media = Media::where('id', $id)->firstOrFail();
-        $requestCount = Permission::where('media_id', $id)->count();
+        $media = Media::with('user')->findOrFail($id);
+        $users = User::all();
+        // dd($media);
+        return view('admin.media.detail', compact('media', 'users'));
+    }
 
-        $requests = Permission::where('media_id', $id)->where('is_approved', 'pending')->with('requester')->get();
-        return view('admin.media.detail', compact('media', 'requestCount', 'requests'));
+    // Share File
+    public function shareFile(Request $request, $id)
+    {
+        $media = Media::findOrFail($id);
+
+        // Jika share ke umum
+        if ($request->input('share_option') === 'public') {
+            $media->status_izin = 'public';
+        } else {
+            // Jika share ke beberapa user yang telah register/terdaftar
+            $userId = str_replace('user_', '', $request->input('share_option'));
+            $media->shared_users()->attach($userId);
+        }
+        $media->save();
+        return redirect()->back()->with('success', 'File Berhasil di Share!');
     }
 
 
@@ -251,15 +252,7 @@ class MediaController extends Controller
         return redirect()->back()->with('success', 'Permintaan izin berhasil ditolak');
     }
 
-    // Share File
-    public function shareFile($id)
-    {
-        $mediaShare = Media::findOrFail($id);
-        $mediaShare->status_izin = true;
-        $mediaShare->save();
-        return redirect()->back()->with('success', 'Permintaan izin berhasil ditolak');
-        // return redirect()->route('media.detail', $id)->with('success', 'File telah dibagikan secara publik.');
-    }
+
 
 
 

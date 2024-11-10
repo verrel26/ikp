@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('file');
             // menyimpan data user yang mengupload file
             $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('media_user');
             // menyimpan type foto(png,jpg) video mp4 dll
             $table->string('type');
             // menyimpan path file
@@ -25,6 +26,7 @@ return new class extends Migration
 
             // Relasi ke tabel user untuk menyimpan siapa yang upload/post/download
             $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict')->onUpdate('cascade');
+            // $table->foreign('media_user')->references('id')->on('media_user')->onDelete('restrict')->onUpdate('cascade');
         });
     }
 

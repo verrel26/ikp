@@ -165,10 +165,10 @@
                                         $categoryClass = 'filter-foto';
                                     } elseif (in_array($item->type, ['mp4', 'mov', 'avi'])) {
                                         $categoryClass = 'filter-video';
-                                        // } elseif ($item->type === 'web') {
-                                        //     $categoryClass = 'filter-web';
-                                        // } elseif (in_array($item->type, ['pdf', 'doc', 'docx'])) {
-                                        //     $categoryClass = 'filter-document';
+                                    } elseif ($item->type === 'web') {
+                                        $categoryClass = 'filter-web';
+                                    } elseif (in_array($item->type, ['pdf', 'doc', 'docx'])) {
+                                        $categoryClass = 'filter-document';
                                     }
                                 @endphp
                                 <div class="col-lg-4 col-md-6 portfolio-item isotope-item {{ $categoryClass }}">

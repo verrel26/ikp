@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Media;
+use App\Models\Permission;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -22,7 +23,7 @@ class HomeController extends Controller
 
     public function detailHome($id)
     {
-        $media = Media::find($id);
+        $media = Media::with('user')->find($id);
         // dd($media);
         return view('detailHome', compact('media'));
     }

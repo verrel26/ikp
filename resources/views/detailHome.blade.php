@@ -30,11 +30,18 @@
                 <div class="row my-3">
                     <div class="col-12 d-flex justify-content-between">
                         <!-- Tombol Back di kiri -->
-                        <a href="/" class="btn btn-info text-white"><i class="bi bi-arrow-left"></i>&nbsp;Back</a>
+                        <a href="/list" class="btn btn-info text-white"><i class="bi bi-arrow-left"></i>&nbsp;Back</a>
 
                         <!-- Tombol Download di kanan -->
-                        {{-- <a href="{{ route('requestDownload', $item->id) }}" class="btn btn-warning text-white"><i
-                                class="bi bi-download"></i>&nbsp;Request Download</a> --}}
+                        {{-- Tombol download ada jika file ini dishared oleh user yang upload --}}
+                        @if ($media->status_izin == 'pending')
+                            <p>{{ $media->status_izin }}</p>
+                        @elseif ($media->status_izin == 'approved')
+                            <a href="{{ route('requestDownload', $media->id) }}" class="btn btn-warning text-white"><i
+                                    class="bi bi-download"></i>&nbsp;Request Download</a>
+                        @endif
+
+
                     </div>
                 </div>
 

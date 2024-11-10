@@ -1,2 +1,10 @@
-1. Menambahkan fungsi berbagi per file foto dan video
-    - dengan ketentuan jika user a menginginkan foto/video dari user b / c, maka harus izin/persetujuan dari user yang mengupload file tersebut 
+Halaman awal (welcome) 
+    - Menampilkan semua file yang ada (ditambahkan user)
+    - Detail file hanya menampilkan nama,file,upload by
+        - untuk download, ketika file itu dishare oleh user yang menambahkan dan diberikan fungsi share untuk semua, baru tampil tombol download ada pada halaman detail awal
+        - tambahkan fungsi share untuk semua atau hanya untuk user yang ada/terdaftar
+    
+Halaman admin
+    - Media (Menampilkan semua file yang ditambahkan oleh user, cuman ketika ingin mendownload harus atau ketika menekan tombol download ada ketentuan "Mohon tunggu izin download dari user yang mengupload file, dan setelah diberikan baru ada notifikasi ke user yang minta request download tadi")
+        - Cara menginformasi ke user yang telah request file yang ingin didownload tadi, ketika user tadi baru login, langsung ada notif bahwa file sudah diberikan izin atau informasi boleh/tidaknya file didownload
+        - Tambahkan fungsi share untuk semua atau hanya untuk user yang ada/terdaftar

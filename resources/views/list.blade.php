@@ -2,9 +2,9 @@
 @section('content')
     <main class="main">
         <section id="portfolio" class="portfolio section">
-
+<br>
             <!-- Section Title -->
-            <div class="container section-title" data-aos="fade-up">
+            <div class="container section-title mt-3" data-aos="fade-up">
                 <h2>Portfolio</h2>
             </div><!-- End Section Title -->
 

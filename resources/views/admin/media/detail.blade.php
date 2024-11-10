@@ -3,7 +3,6 @@
 
 @section('content')
     <div class="card-header">Detail <b>{{ $media->file }}</b></div>
-
     <div class="card-body">
         <div class="row">
             <div class="col-md-6">
@@ -18,27 +17,41 @@
                 <h5>Nama user: <b>{{ $media->user->name }}</b></h5>
                 <h5>Type: {{ $media->type }}</h5>
                 <h5>File Path: {{ $media->file_path }}</h5>
-                {{-- <h5>Status Izin: {{ $media->status_izin }}</h5> --}}
                 <h5>Status Izin: {{ $media->status_izin ? 'Diberikan' : 'Ditolak' }}</h5>
 
-
+                <!-- Tombol hanya muncul jika file dimiliki oleh user lain -->
                 @if ($media->user_id != Auth::id())
-                    <!-- Tombol minta izin jika file dimiliki oleh user lain -->
                     <form action="{{ route('media.requestPermission', $media->id) }}" method="POST">
                         @csrf
                         <button type="submit" class="btn btn-primary btn-sm">Minta Izin Download</button>
                     </form>
-                @else
-                    <a href="{{ asset('storage/' . $media->file_path) }}" class="btn btn-primary btn-sm">Download</a>
                 @endif
 
+                <!-- Tombol Share File selalu muncul -->
                 <form action="{{ route('media.shareFile', $media->id) }}" method="POST" style="display:inline;">
                     @csrf
-                    <button type="submit" class="btn btn-info btn-sm">Share File</button>
+                    <div class="btn-group">
+                        {{-- tombol share ke umum --}}
+                        <button type="submit" name="share_option" value="public" class="btn btn-info btn-sm">Share File
+                            Umum</button>
+
+                        {{-- tombol share ke user  --}}
+                        <button type="submit" class="btn btn-warning btn-sm dropdown-toggle" data-bs-toggle="dropdown"
+                            aria-expanded="false">Share File
+                            User
+                        </button>
+                        <ul class="dropdown-menu">
+                            {{-- menampilkan data user yang ada --}}
+                            @foreach ($users as $user)
+                                <li><button class="dropdown-item" type="submit" name="share-option"
+                                        value="user_{{ $user->id }}">{{ $user->name }}</button></li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </form>
             </div>
         </div>
-        <div class="row mt-4">
+        {{-- <div class="row mt-4">
             <h5>Jumlah Pengajuan Izin: {{ $requestCount }}</h5>
             @if ($requests->isEmpty())
                 <br>
@@ -62,6 +75,7 @@
                     @endforeach
                 </ul>
             @endif
-        </div>
+        </div> --}}
     </div>
+
 @endsection

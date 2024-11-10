@@ -11,6 +11,8 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('media_user');
+            $table->unsignedBigInteger('media_id');
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
@@ -18,6 +20,9 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
 
+            // $table->foreign('media_user')->references('id')->on('media_user')->onDelete('restrict')->onUpdate('cascade');
+
+            // $table->foreign('media_id')->references('id')->on('medias')->onDelete('restrict')->onUpdate('cascade');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -36,7 +41,7 @@ return new class extends Migration
         });
     }
 
-   
+
     public function down(): void
     {
         Schema::dropIfExists('users');

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Media extends Model
 {
+    use HasFactory;
     protected $table = "medias";
     protected $fillable = [
         'file',
@@ -22,9 +25,10 @@ class Media extends Model
         return $this->belongsTo(User::class);
     }
 
-    // relasi model download
-    public function downloadReq()
+    // Relasi share file
+    public function shared_users(): BelongsToMany
     {
-        return $this->hasMany(Permission::class);
+        return $this->belongsToMany(User::class, 'media_user', 'media_id', 'user_id')
+            ->withTimestamps();
     }
 }

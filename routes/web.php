@@ -17,6 +17,7 @@ Route::get('/', [HomeController::class, 'index']);
 
 Route::get('/detailHome/{id}', [HomeController::class, 'detailHome'])->name('detailHome');
 Route::get('/list', [HomeController::class, 'list'])->name('list');
+Route::get('/requestDownload', [HomeController::class, 'requestDownload'])->name('requestDownload');
 
 
 
@@ -49,13 +50,12 @@ Route::middleware('auth')->group(function () {
         Route::put('update', 'update')->name('media.update');
         Route::delete('delete', 'delete')->name('media.delete');
         Route::get('{id}/detail', 'detail')->name('media.detail');
+        // Share File
+        Route::post('{id}/shareFile', 'shareFile')->name('media.shareFile');
         Route::get('approve', 'approve')->name('media.approve');
         Route::post('requestPermission/{id}', 'requestPermission')->name('media.requestPermission');
         Route::post('approveRequest/{id}', 'approveRequest')->name('media.approveRequest');
         Route::post('deliceRequest/{id}', 'deliceRequest')->name('media.deliceRequest');
-
-        // Share File
-        Route::post('shareFile/{id}', 'shareFile')->name('media.shareFile');
     });
     // Permission
     Route::controller(PermissionController::class)->prefix('permissions')->group(function () {
