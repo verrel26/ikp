@@ -26,4 +26,11 @@ class HomeController extends Controller
         // dd($media);
         return view('detailHome', compact('media'));
     }
+
+    public function list()
+    {
+        $medialist = Media::with('user')->get();
+        // dd($medialist);
+        return view('list', compact('medialist'));
+    }
 }

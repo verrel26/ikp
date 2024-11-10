@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index']);
 
 Route::get('/detailHome/{id}', [HomeController::class, 'detailHome'])->name('detailHome');
+Route::get('/list', [HomeController::class, 'list'])->name('list');
 
 
 

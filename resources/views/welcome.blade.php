@@ -152,7 +152,7 @@
                             <li data-filter="*" class="filter-active">All</li>
                             <li data-filter=".filter-foto">Foto</li>
                             <li data-filter=".filter-video">Video</li>
-                            <li data-filter=".filter-web">Web</li>
+                            {{-- <li data-filter=".filter-web">Web</li> --}}
                             {{-- <li data-filter=".filter-document">Doc</li> --}}
                         </ul><!-- End Portfolio Filters -->
 
@@ -165,8 +165,8 @@
                                         $categoryClass = 'filter-foto';
                                     } elseif (in_array($item->type, ['mp4', 'mov', 'avi'])) {
                                         $categoryClass = 'filter-video';
-                                    } elseif ($item->type === 'web') {
-                                        $categoryClass = 'filter-web';
+                                        // } elseif ($item->type === 'web') {
+                                        //     $categoryClass = 'filter-web';
                                         // } elseif (in_array($item->type, ['pdf', 'doc', 'docx'])) {
                                         //     $categoryClass = 'filter-document';
                                     }
@@ -204,12 +204,14 @@
                                 </div>
                             @endforeach
                         </div>
-                        <a href=""
-                            class="btn btn-info text-white mt-3 d-flex mx-auto justify-content-center">Infsdjk</a>
+                        <div class="text-center">
+                            <a href="{{ route('list') }}" class="btn btn-info text-white mt-3">Load More</a>
+                        </div>
                         <!-- End Portfolio Container -->
                     </div>
                 </div>
-            </section><!-- /Portfolio Section -->
+            </section>
+            <!-- /Portfolio Section -->
 
             <!-- Contact Section -->
             <section id="contact" class="contact section">
