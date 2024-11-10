@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 Route::get('/', [HomeController::class, 'index']);
+Route::get('/files', [HomeController::class, 'files'])->name('files');
 
 Route::get('/detailHome/{id}', [HomeController::class, 'detailHome'])->name('detailHome');
 Route::get('/list', [HomeController::class, 'list'])->name('list');

@@ -28,10 +28,18 @@ class HomeController extends Controller
         return view('detailHome', compact('media'));
     }
 
+<<<<<<< HEAD
     public function list()
     {
         $medialist = Media::with('user')->get();
         // dd($medialist);
         return view('list', compact('medialist'));
+=======
+    public function files()
+    {
+        $data = Media::all();
+
+        dd($data);
+>>>>>>> 5218666cca63eb04b60de6092fbc19289f340973
     }
 }
