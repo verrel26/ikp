@@ -16,6 +16,7 @@ class Media extends Model
         'type',
         'file_path',
         'status_izin',
+        'file_share',
     ];
 
 
@@ -30,5 +31,10 @@ class Media extends Model
     {
         return $this->belongsToMany(User::class, 'media_user', 'media_id', 'user_id')
             ->withTimestamps();
+    }
+
+    public function permission()
+    {
+        return $this->hasMany(Media::class);
     }
 }

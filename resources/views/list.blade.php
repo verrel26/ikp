@@ -2,16 +2,13 @@
 @section('content')
     <main class="main">
         <section id="portfolio" class="portfolio section">
-<br>
-            <!-- Section Title -->
+            <br>
             <div class="container section-title mt-3" data-aos="fade-up">
-                <h2>Portfolio</h2>
-            </div><!-- End Section Title -->
+                <h2>Portfolio All</h2>
+            </div>
 
             <div class="container">
-
                 <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
-
                     <ul class="portfolio-filters isotope-filters" data-aos="fade-up" data-aos-delay="100">
                         <li data-filter="*" class="filter-active">All</li>
                         <li data-filter=".filter-foto">Foto</li>

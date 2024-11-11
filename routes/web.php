@@ -18,7 +18,12 @@ Route::get('/files', [HomeController::class, 'files'])->name('files');
 
 Route::get('/detailHome/{id}', [HomeController::class, 'detailHome'])->name('detailHome');
 Route::get('/list', [HomeController::class, 'list'])->name('list');
-Route::get('/requestDownload', [HomeController::class, 'requestDownload'])->name('requestDownload');
+Route::post('/shareFile', [HomeController::class, 'shareFile'])->name('shareFile');
+Route::get('/downloadFile/{id}', [HomeController::class, 'downloadFile'])->name('downloadFile');
+Route::post('/reqDownload/{id}', [HomeController::class, 'reqDownload'])->name('reqDownload');
+
+
+
 
 
 
@@ -51,12 +56,10 @@ Route::middleware('auth')->group(function () {
         Route::put('update', 'update')->name('media.update');
         Route::delete('delete', 'delete')->name('media.delete');
         Route::get('{id}/detail', 'detail')->name('media.detail');
-        // Share File
-        Route::post('{id}/shareFile', 'shareFile')->name('media.shareFile');
-        Route::get('approve', 'approve')->name('media.approve');
-        Route::post('requestPermission/{id}', 'requestPermission')->name('media.requestPermission');
-        Route::post('approveRequest/{id}', 'approveRequest')->name('media.approveRequest');
-        Route::post('deliceRequest/{id}', 'deliceRequest')->name('media.deliceRequest');
+        Route::get('{id}/ddownload', 'ddownload')->name('media.ddownload');
+        Route::post('{id}/Reqdownload', 'Reqdownload')->name('media.Reqdownload');
+        Route::post('{id}/approve', 'approve')->name('media.approve');
+        Route::post('{id}/decline', 'decline')->name('media.decline');
     });
     // Permission
     Route::controller(PermissionController::class)->prefix('permissions')->group(function () {

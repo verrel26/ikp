@@ -69,18 +69,24 @@
                         render: function(data, type, row) {
                             let detailRoute = "{{ route('media.detail', ':id') }}".replace(':id', row.id);
 
+                            // Status izin download
                             if (row.status_izin == true) {
                                 return `<div class="flex items-center justify-end space-x-2 d-block mx-auto">
-                                            <a href="${detailRoute}" class="btn btn-sm btn-info"><i class="bi bi-trash fs-4 me-2"></i> Detail</a>
-                                        </div>`;
+                                    <a href="${detailRoute}" class="btn btn-sm btn-info"><i class="bi bi-trash fs-4 me-2"></i> Detail</a>
+                                    
+                                </div>`;
                             } else {
                                 return `<div class="flex items-center justify-end space-x-2 d-block mx-auto">
-                                <a href="${detailRoute}" class="btn btn-sm btn-info"><i class="bi bi-trash fs-4 me-2"></i> Detail</a>
-                                <button class="btn btn-sm btn-warning edit" data-id="${data.id}"><i class="bi bi-pencil fs-4 me-2"></i> Edit</button>
-                                <button class="btn btn-sm btn-danger delete" data-id="${data.id}"><i class="bi bi-trash fs-4 me-2"></i> Delete</button>
-                                <button class="btn btn-sm btn-primary approve" data-id="${data.id}"><i class="bi bi-trash fs-4 me-2"></i> Approve</button>
+                                
+                                <a href="${detailRoute}" class="btn btn-sm btn-info">Detail</a>&nbsp;
+
+                                <button class="btn btn-sm btn-warning edit" data-id="${data.id}"><i class="bi bi-pencil fs-4 me-2"></i> Edit</button>&nbsp;
+                                
+                                <button class="btn btn-sm btn-danger delete" data-id="${data.id}"><i class="bi bi-trash fs-4 me-2"></i> Delete</button>&nbsp;
+                              
                                 </div>`;
                             }
+
                         }
                     }
 
@@ -196,7 +202,7 @@
 
                 if (result) {
                     $.ajax({
-                        url: '{{ route('media.approve') }}',
+                        url: '{{ route('media.approve', auth()->user()->id) }}',
                         method: "GET",
                         data: {
                             id: id

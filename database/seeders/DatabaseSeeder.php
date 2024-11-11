@@ -16,9 +16,8 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'media_user' => 1,
-            'media_id' => 1,
-            'email' => 'admin@localhost',
+            'name' => 'razak',
+            'email' => 'razak@localhost',
             'email_verified_at' => now(),
             'password' => Hash::make("password"),
             'remember_token' => Str::random(10)

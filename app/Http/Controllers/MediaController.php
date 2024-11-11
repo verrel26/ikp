@@ -91,6 +91,7 @@ class MediaController extends Controller
         $media = Media::with('user')->findOrFail($id);
         $users = User::all();
         // dd($media);
+
         return view('admin.media.detail', compact('media', 'users'));
     }
 
@@ -98,57 +99,71 @@ class MediaController extends Controller
     public function shareFile(Request $request, $id)
     {
         $media = Media::findOrFail($id);
+        // dd($media);
+        $shareOption = $request->input('share_option');
 
-        // Jika share ke umum
-        if ($request->input('share_option') === 'public') {
+        // update file ke umum / user
+        if ($shareOption == 'public') {
             $media->status_izin = 'public';
-        } else {
-            // Jika share ke beberapa user yang telah register/terdaftar
-            $userId = str_replace('user_', '', $request->input('share_option'));
-            $media->shared_users()->attach($userId);
+            $media->save();
+            return redirect()->back()->with('success', 'File Berhasil di Share Umum!');
+        } elseif (strpos($shareOption, 'user_') === 0) {
+            $userId = str_replace('user_', '', $shareOption);
+
+            $media->permission()->create([
+                'user' => $userId,
+                'status' => 'private'
+            ]);
         }
+        return redirect()->back()->with('error', 'Pilihan share tidak valid');
+    }
+
+    public function reqDownload($id)
+    {
+        $media = Media::findOrFail($id);
+
+        // cek yang login bukan pengupload file
+        if (auth()->id() != $media->user_id) {
+            if ($media->status_izin == 'pending' || $media->status_izin == 'approved') {
+                return redirect()->back()->with('message', 'Pengajuan izin download sudah dikirim.');
+            }
+            $media->status_izin = 'pending';
+            $media->save();
+            return redirect()->back()->with('message', 'Pengajuan download telah dikirim ke pemilik file.');
+        }
+        return redirect()->back()->with('error', 'Anda adalah pengunggah file ini.');
+    }
+
+    public function ddownload($id)
+    {
+        $media = Media::findOrFail($id);
+
+        if ($media->status_izin == 'public' || $media->status_izin == 'approved') {
+            return response()->download(storage_path("app/public/{$media->file_path}"));
+        }
+
+        return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mendownload file ini.');
+    }
+
+    public function approve($id)
+    {
+        $media = Media::find($id);
+        $media->status_izin = 'approved';
         $media->save();
-        return redirect()->back()->with('success', 'File Berhasil di Share!');
+
+        return redirect()->back()->with('success', 'Success');
     }
-
-
-    // fungsi request download 
-    public function reqDownload($mediaId)
+    public function decline($id)
     {
-        $media = Media::find($mediaId);
-        $user = auth()->user();
 
-        // cek apakah user sudah pernah mengajukan sebelumnya
-        $cekReq = Permission::where('user_id', $user->id)
-            ->where('media_id', $mediaId)
-            ->first();
+        $media = Media::find($id);
+        $media->status_izin = 'declined';
+        $media->save();
 
-        if ($cekReq) {
-            return back()->with('error', 'anda telah mengajukan download file ini!');
-        }
-
-        //  Membuat req download baru
-        Permission::create([
-            'user_id' => $user->id,
-            'media_id' => $mediaId,
-            'is_approved' => Permission::STATUS_PENDING,
-        ]);
-
-        return back()->with('success', 'anda berhasil mengajukan download file!');
+        return redirect()->back()->with('success', 'Success');
     }
 
-    // fungsi tampil request download
-    public function showReq($mediaId)
-    {
-        $media = Media::find($mediaId);
 
-        //hanya pengupload yang bisa mengakses halaman ini
-        // $this->authorize('view', $media);
-
-        // $request = $media->downloadRequests;
-
-        // return view('admin.media.detail')
-    }
 
 
     public function edit(Media $media)
@@ -177,82 +192,6 @@ class MediaController extends Controller
             ]);
         }
     }
-
-    public function approve(Request $request)
-    {
-        try {
-            $media = Media::find($request->id);
-
-            $media->status_izin = true;
-
-            $media->save();
-            return response()->json([
-                'success' => true,
-                'messages' => 'Media has been updated',
-                'data' => $media
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'messages' => $e->getMessage()
-            ]);
-        }
-    }
-
-
-    // mengajukan download file 
-    public function requestPermission($fileId)
-    {
-        // File yang mau didownload
-        $file = Media::findOrFail($fileId);
-        // user yang ingin mendownload
-        $requestId = Auth::id();
-
-        // cek apakah sudah mengajukan sebelumnya
-        $cekRequest = Permission::where('media_id', $fileId)
-            ->where('user_id', $requestId)
-            ->first();
-
-        if ($cekRequest) {
-            return redirect()->back()->with('error', 'Anda sudah mengajukan permintaan');
-        }
-
-        Permission::create([
-            'media_id' => $file,
-            'user_id' => $requestId,
-            'owner_id' => $file->user_id
-
-        ]);
-        return redirect()->back()->with('success', 'Permintaan berhasil di ajukan');
-    }
-
-    // daftar yang ingin download 
-    public function viewPermissionRequest()
-    {
-        $requests = Permission::with(['file', 'requester'])->where('owner_id', Auth::id())->get();
-        return view('admin.media.index', compact('requests'));
-    }
-
-    // approved success
-    public function approveRequest($id)
-    {
-        $request = Permission::findOrFail($id);
-        $request->is_approved = true;
-        $request->save();
-
-        return redirect()->back()->with('success', 'Permintaan izin berhasil disetujui');
-    }
-
-
-    // approved tolak
-    public function deliceRequest($id)
-    {
-        $request = Permission::findOrFail($id);
-        $request->delete();
-        return redirect()->back()->with('success', 'Permintaan izin berhasil ditolak');
-    }
-
-
 
 
 

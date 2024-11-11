@@ -28,18 +28,42 @@ class HomeController extends Controller
         return view('detailHome', compact('media'));
     }
 
-<<<<<<< HEAD
+
     public function list()
     {
         $medialist = Media::with('user')->get();
         // dd($medialist);
         return view('list', compact('medialist'));
-=======
-    public function files()
-    {
-        $data = Media::all();
+    }
 
-        dd($data);
->>>>>>> 5218666cca63eb04b60de6092fbc19289f340973
+    public function downloadFile($id)
+    {
+        $media = Media::findOrFail($id);
+
+        if ($media->status_izin == 'public') {
+            $filePath = storage_path('app/public/' . $media->file_path);
+
+            if (file_exists($filePath)) {
+                return response()->download($filePath, $media->file);
+            } else {
+                return redirect()->back()->with('message', 'File tidak ditemukan');
+            }
+        } else {
+            return redirect()->back()->with('message', 'Anda tidak memiliki izin untuk download file ini!');
+        }
+    }
+
+    public function reqDownload($id)
+    {
+        $reqMedia = Media::findOrFail($id);
+        // dd($reqMedia); 
+
+        if ($reqMedia->status_izin == 'pending') {
+            return redirect()->back()->with('message', 'Pengajuan download sudah dikirimkan sebelumnya.');
+        }
+        $reqMedia->status_izin = 'pending';
+        $reqMedia->save();
+
+        return redirect()->back()->with('message', 'Pengajuan download telah dikirim ke pemilik file.');
     }
 }
