@@ -60,6 +60,7 @@ Route::middleware('auth')->group(function () {
         Route::post('{id}/Reqdownload', 'Reqdownload')->name('media.Reqdownload');
         Route::post('{id}/approve', 'approve')->name('media.approve');
         Route::post('{id}/decline', 'decline')->name('media.decline');
+        Route::post('{id}/setPublic', 'setPublic')->name('media.setPublic');
     });
     // Permission
     Route::controller(PermissionController::class)->prefix('permissions')->group(function () {

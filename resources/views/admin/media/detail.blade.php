@@ -41,21 +41,43 @@
             </div>
         </div>
         <div class="row mt-4">
-            {{-- Fungsi Approved / Delice --}}
-            @if (auth()->user()->id == $media->user_id && $media->status_izin == 'pending')
-                <form action="{{ route('media.approve', $media->id) }}" method="POST" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="btn btn-success btn-sm">Setuju</button>
-                </form>
-                <form action="{{ route('media.decline', $media->id) }}" method="POST" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="btn btn-danger btn-sm">Tolak</button>
-                </form>
+            {{-- Fungsi untuk User Pemilik File --}}
+            @if (auth()->user()->id == $media->user_id)
+                @if ($media->status_izin == 'pending')
+                    <form action="{{ route('media.approve', $media->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-success btn-sm">Setuju</button>
+                    </form>
+                    <form action="{{ route('media.decline', $media->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-danger btn-sm">Tolak</button>
+                    </form>
+                @elseif ($media->status_izin == 'approved')
+                    <form action="{{ route('media.setPublic', $media->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-primary btn-sm">Jadikan Publik</button>
+                    </form>
+                @endif
             @endif
 
+            {{-- Tampilkan tombol download jika status izin adalah public atau approved --}}
+            @if ($media->status_izin == 'public' || ($media->status_izin == 'approved' && auth()->user()->id != $media->user_id))
+                <a href="{{ route('media.ddownload', $media->id) }}" class="btn btn-warning text-white">
+                    <i class="bi bi-download"></i>&nbsp;Download
+                </a>
+            @endif
 
-
+            {{-- Tombol Ajukan Download untuk User yang Bukan Pemilik File --}}
+            @if ($media->status_izin == 'pending' && auth()->user()->id != $media->user_id)
+                <form action="{{ route('media.reqDownload', $media->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-download"></i>&nbsp;Ajukan Download
+                    </button>
+                </form>
+            @endif
         </div>
+
         <a href="{{ route('media.index', auth()->user()->name) }}" class="btn btn-info btn-sm"><i
                 class="nav-icon fas fa-chevron-circle-left"></i>&nbsp;Back</a>
     </div>

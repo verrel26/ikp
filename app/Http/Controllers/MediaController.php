@@ -163,6 +163,15 @@ class MediaController extends Controller
         return redirect()->back()->with('success', 'Success');
     }
 
+    public function setPublic($id)
+    {
+        $media = Media::findOrFail($id);
+        $media->status_izin = 'public';
+        $media->save();
+
+        return redirect()->back()->with('success', 'File sekarang bersifat publik.');
+    }
+
 
 
 
