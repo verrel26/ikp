@@ -16,8 +16,11 @@ class HomeController extends Controller
     // }
     public function index()
     {
-        $media = Media::whereIn('type', ['png', 'jpg', 'jpeg', 'mp4', 'mov', 'avi'])->paginate(6); // Batasi 6 item pertama
-        return view('welcome', compact('media'));
+        $media = Media::whereIn('type', ['png', 'jpg', 'jpeg', 'mp4', 'mov', 'avi'])->paginate(6); // 
+        $mediaPublic = Media::where('status_izin', 'public')->get();
+        // dd($mediaPublic);
+
+        return view('welcome', compact('media', 'mediaPublic'));
     }
 
 
@@ -31,7 +34,7 @@ class HomeController extends Controller
 
     public function list()
     {
-        $medialist = Media::with('user')->get();
+        $medialist = Media::where('status_izin', 'public')->with('user')->get();
         // dd($medialist);
         return view('list', compact('medialist'));
     }

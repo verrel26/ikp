@@ -6,7 +6,7 @@
 
     <div class="card-body">
         <a type="button" href="#" class="btn btn-sm fw-bold btn-primary mb-2" data-toggle="modal"
-            data-target="#modal-add-media">Tambah Media</a>
+            data-target="#modal-add-media"><i class="nav-icon fas fa-plus-circle"></i>&nbsp;Tambah Media</a>
         <table id="table" class="table table-bordered">
             <thead>
                 <tr>
@@ -72,17 +72,17 @@
                             // Status izin download
                             if (row.status_izin == true) {
                                 return `<div class="flex items-center justify-end space-x-2 d-block mx-auto">
-                                    <a href="${detailRoute}" class="btn btn-sm btn-info"><i class="bi bi-trash fs-4 me-2"></i> Detail</a>
+                                    <a href="${detailRoute}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-plus-circle"></i>&nbsp; Detail</a>
                                     
                                 </div>`;
                             } else {
                                 return `<div class="flex items-center justify-end space-x-2 d-block mx-auto">
                                 
-                                <a href="${detailRoute}" class="btn btn-sm btn-info">Detail</a>&nbsp;
+                                <a href="${detailRoute}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-eye"></i>&nbsp;Detail</a>&nbsp;
 
-                                <button class="btn btn-sm btn-warning edit" data-id="${data.id}"><i class="bi bi-pencil fs-4 me-2"></i> Edit</button>&nbsp;
+                                <button class="btn btn-sm btn-warning edit" data-id="${data.id}"><i class="nav-icon fas fa-edit"></i>&nbsp; Edit</button>&nbsp;
                                 
-                                <button class="btn btn-sm btn-danger delete" data-id="${data.id}"><i class="bi bi-trash fs-4 me-2"></i> Delete</button>&nbsp;
+                                <button class="btn btn-sm btn-danger delete" data-id="${data.id}"><i class="nav-icon fas fa-trash-alt"></i>&nbsp; Delete</button>&nbsp;
                               
                                 </div>`;
                             }
@@ -150,24 +150,34 @@
 
             // edit
             $(document).on('click', '.edit', function(e) {
-                e.preventDefault()
+                e.preventDefault();
                 var data = table.DataTable().row($(this).closest('tr')).data();
 
                 $('#modal-add-media').modal('show');
-                $('#modal-add-media').find('#title').text('Edit Media');
+                $('#modal-add-media').find('#file').text('Edit Media');
                 $('#form-add-media').attr('action', '{{ route('media.update') }}');
                 $('#form-add-media').append('<input type="hidden" name="_method" value="PUT">');
                 $('#form-add-media').append('<input type="hidden" name="id" value="' + data.id + '">');
-                $('#media').val(data.file);
-            })
 
-            $('#modal-add-media').on('hidden.bs.modal', function() {
-                $('#modal-add-media').find('#title').text('Add Media');
-                $('#form-add-media input[name="_method"]').remove();
-                $('#form-add-media input[name="id"]').remove();
-                $('#form-add-media').attr('action', '{{ route('media.store') }}');
-                $('#form-add-media')[0].reset();
-            })
+                $('#file').val(data.file);
+                $('#file_path').val(data.file_path);
+
+                const filePath = '/storage/' + data.file_path;
+                const fileType = data.file_path.split('.').pop()
+                    .toLowerCase();
+
+                if (fileType === 'jpg' || fileType === 'jpeg' || fileType === 'png' || fileType === 'gif') {
+                    $('#image-preview').attr('src', filePath).show();
+                    $('#video-preview').hide();
+                } else if (fileType === 'mp4' || fileType === 'webm' || fileType === 'ogg') {
+                    $('#video-preview').attr('src', filePath).show();
+                    $('#image-preview').hide();
+                } else {
+                    $('#image-preview').hide();
+                    $('#video-preview').hide();
+                }
+            });
+
 
             // Detail
             $(document).on('click', '.detail', function(e) {
@@ -195,6 +205,7 @@
                 }
             });
 
+            // Approve
             $(document).on('click', '.approve', function() {
                 var id = $(this).data('id')
                 console.log(id);

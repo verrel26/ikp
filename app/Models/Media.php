@@ -16,7 +16,7 @@ class Media extends Model
         'type',
         'file_path',
         'status_izin',
-        'file_share',
+        'requested_by',
     ];
 
 
@@ -36,5 +36,10 @@ class Media extends Model
     public function permission()
     {
         return $this->hasMany(Media::class);
+    }
+
+    public function requestedUser()
+    {
+        return $this->belongsTo(User::class, 'requested_by');
     }
 }

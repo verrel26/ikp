@@ -121,18 +121,32 @@ class MediaController extends Controller
     public function reqDownload($id)
     {
         $media = Media::findOrFail($id);
+        $userId = Auth::user()->id;
 
-        // cek yang login bukan pengupload file
-        if (auth()->id() != $media->user_id) {
-            if ($media->status_izin == 'pending' || $media->status_izin == 'approved') {
-                return redirect()->back()->with('message', 'Pengajuan izin download sudah dikirim.');
+        // $isAdmin = Auth::user()->name == 'Admin';
+        // dd($isAdmin);
+        if ($userId != $media->user_id) {
+
+            $requestBy = $media->requested_by ? json_decode($media->requested_by, true) : [];
+
+
+            if (!in_array($userId, $requestBy)) {
+
+                $requestBy[] = $userId;
+                $media->requested_by = json_encode($requestBy);
+                $media->status_izin = 'pending';
+                $media->save();
+
+                return redirect()->route('media.detail', $id)->with('message', 'Pengajuan download berhasil dikirim');
             }
-            $media->status_izin = 'pending';
-            $media->save();
-            return redirect()->back()->with('message', 'Pengajuan download telah dikirim ke pemilik file.');
+
+            return redirect()->route('media.detail', $id)->with('message', 'Pengajuan download telah dikirim ke pemilik file');
         }
-        return redirect()->back()->with('error', 'Anda adalah pengunggah file ini.');
+
+        return redirect()->route('media.detail', $id)->with('error', 'Anda adalah pengunggah file ini.');
     }
+
+
 
     public function ddownload($id)
     {
@@ -149,6 +163,7 @@ class MediaController extends Controller
     {
         $media = Media::find($id);
         $media->status_izin = 'approved';
+        $media->requested_by = auth()->id();
         $media->save();
 
         return redirect()->back()->with('success', 'Success');
@@ -173,15 +188,53 @@ class MediaController extends Controller
     }
 
 
+    public function edit(Media $media) {}
 
 
-    public function edit(Media $media)
+    public function update(Request $request, $id)
     {
-        //
+        try {
+            $this->validateData($request);
+
+            $media = Media::findOrFail($id);
+
+            $media->file = $request->file;
+            if ($request->hasFile('file')) {
+                if ($media->file_path && file_exists(storage_path('app/public/' . $media->file_path))) {
+                    unlink(storage_path('app/public/' . $media->file_path));
+                }
+
+                $file = $request->file('file');
+                $extension = $file->getClientOriginalExtension();
+
+                if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+                    $folder = 'uploads/gambar';
+                } elseif (in_array($extension, ['mp4', 'avi', 'mov'])) {
+                    $folder = 'uploads/video';
+                } else {
+                    $folder = 'uploads/document';
+                }
+
+                $path = $file->store($folder, 'public');
+                $media->file_path = $path;
+            }
+
+            $media->save();
+
+            echo "berhasil di edit";
+            // return response()->json([
+            //     'success' => true,
+            //     'message' => 'Media ' . $media->file . ' berhasil diperbarui'
+            // ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
 
-    public function update(Request $request, $id) {}
 
 
     public function delete(Request $request)

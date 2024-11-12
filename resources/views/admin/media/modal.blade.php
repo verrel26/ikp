@@ -18,6 +18,11 @@
                     </div>
                     <div class="form-group">
                         <label>Media</label>
+                        <img id="image-preview" src="#" alt="Preview" style="display: none; max-width: 80%;">
+                        <video id="video-preview" controls style="display: none; max-width: 80%;">
+                            <source src="#" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                         <input type="file" name="type[]" id="type[]" multiple class="form-control">
                         <input type="hidden" name="status_izin" id="status_izin" class="form-control" value="pending">
                     </div>
