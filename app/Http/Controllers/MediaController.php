@@ -191,12 +191,12 @@ class MediaController extends Controller
     public function edit(Media $media) {}
 
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         try {
             $this->validateData($request);
 
-            $media = Media::findOrFail($id);
+            $media = Media::findOrFail($request->id);
 
             $media->file = $request->file;
             if ($request->hasFile('file')) {
@@ -221,11 +221,10 @@ class MediaController extends Controller
 
             $media->save();
 
-            echo "berhasil di edit";
-            // return response()->json([
-            //     'success' => true,
-            //     'message' => 'Media ' . $media->file . ' berhasil diperbarui'
-            // ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Media ' . $media->file . ' berhasil diperbarui'
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -241,6 +240,9 @@ class MediaController extends Controller
     {
         try {
             $media = Media::findOrFail($request->id);
+            if ($media->file_path && file_exists(storage_path('app/public/' . $media->file_path))) {
+                unlink(storage_path('app/public/' . $media->file_path));
+            }
             $media->delete();
 
             return response()->json([
