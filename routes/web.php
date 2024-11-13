@@ -23,10 +23,6 @@ Route::get('/downloadFile/{id}', [HomeController::class, 'downloadFile'])->name(
 Route::post('/reqDownload/{id}', [HomeController::class, 'reqDownload'])->name('reqDownload');
 
 
-
-
-
-
 // Login
 Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
