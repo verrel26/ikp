@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
         Route::get('', 'index')->name('user.index');
         Route::get('data', 'data')->name('user.data');
         Route::post('store', 'store')->name('user.store');
-        Route::put('update/{id}', 'update')->name('user.update');
+        Route::put('update', 'update')->name('user.update');
         Route::delete('delete', 'delete')->name('user.delete');
     });
     // Media

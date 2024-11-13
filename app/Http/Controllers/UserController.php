@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
@@ -13,9 +14,6 @@ class UserController extends Controller
         return view('admin.user.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function data()
     {
         $data = User::all();
@@ -27,43 +25,99 @@ class UserController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
-        //
+        try {
+            $this->validateData($request);
+            $user = new User();
+            $user->name = $request->name;
+            $user->email = $request->email;
+
+            if ($request->password != null) {
+                $user->password = Hash::make($request->password);
+            }
+
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil menambahkan user',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(Request $request)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit(Request $request)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request)
     {
-        //
+        try {
+            $this->validateData($request);
+
+            $user = User::findOrFail($request->id);
+            $user->name = $request->name;
+            $user->email = $request->email;
+            if ($request->password != null) {
+                $user->password = Hash::make($request->password);
+            }
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User ' . $user->file . ' berhasil di update'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Request $request)
+
+    public function delete(Request $request)
     {
-        //
+        try {
+            $user = User::findOrFail($request->id);
+            $user->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil menghapus user',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+
+    private function validateData($request)
+    {
+        return $request->validate([
+            'name' => 'required|string',
+            'email' => 'nullable|email',
+        ], [
+            'name.reqired' => 'Nama harus di isi',
+            'email.email' => 'Email tidak valid',
+        ]);
     }
 }

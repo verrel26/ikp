@@ -7,6 +7,7 @@
     <div class="card-body">
         <a type="button" href="#" class="btn btn-sm fw-bold btn-primary mb-2" data-toggle="modal"
             data-target="#modal-add-user">Tambah User</a>
+
         <table id="table" class="table table-bordered">
             <thead>
                 <tr>
@@ -28,19 +29,20 @@
             </tfoot>
         </table>
     </div>
-    </div>
 
     @include('admin.user.modal')
 @endsection
 
 @section('scripts')
     <script>
+        // Determine if the logged-in user is an admin
+        const isAdmin = @json(Auth::user()->name == 'Admin');
+
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-
 
         $(function() {
             function defineColumns() {
@@ -54,23 +56,23 @@
                     {
                         data: 'email',
                     },
-
                     {
                         data: null,
                         render: function(data, type, row) {
-                            return `<div class="flex items-center justify-end space-x-2">
-                        @can('update-user')
-                        <button class="btn btn-warning btn-sm edit" data-id="${data.id}"><i class="bi bi-pencil fs-4 me-2"></i> Edit</button>
-                        @endcan
-
-                        @can('delete-user')
-                        <button class="btn btn-sm btn-danger delete" data-id="${data.id}"><i class="bi bi-trash fs-4 me-2"></i> Delete</button>
-                        @endcan
-                    </div>`;
+                            // Conditionally render action buttons for admin only
+                            if (isAdmin) {
+                                return `
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <button class="btn btn-warning btn-sm edit" data-id="${data.id}"><i class="nav-icon fas fa-pencil-alt"></i>&nbsp; Edit</button>&nbsp;
+                                        <button class="btn btn-sm btn-danger delete" data-id="${data.id}"><i class="nav-icon fas fa-trash-alt"></i>&nbsp; Delete</button>
+                                    </div>`;
+                            }
+                            return ''; // No buttons for non-admins
                         }
                     }
-                ]
+                ];
             }
+
             var table = $('#table');
             var config = {
                 dom: "<'row mb-2'<'col-sm-6 d-flex align-items-center justify-conten-start dt-toolbar'l><'col-sm-6 d-flex align-items-center justify-content-end dt-search'f>><'table-responsive'tr><'row'<'col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start'i><'col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end'p>>",
@@ -122,6 +124,21 @@
                         toastr.error('Terjadi kesalahan pada server.');
                     }
                 });
+            });
+
+            // Edit
+            $(document).on('click', '.edit', function(e) {
+                e.preventDefault();
+                var data = table.DataTable().row($(this).closest('tr')).data();
+
+                $('#modal-add-user').modal('show');
+                $('#modal-add-user').find('#name').text('Edit User');
+                $('#form-add-user').attr('action', '{{ route('user.update') }}');
+                $('#form-add-user').append('<input type="hidden" name="_method" value="PUT">');
+                $('#form-add-user').append('<input type="hidden" name="id" value="' + data.id + '">');
+
+                $('#name').val(data.name);
+                $('#email').val(data.email);
             });
 
             // Event delete

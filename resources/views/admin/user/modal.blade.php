@@ -12,13 +12,13 @@
                     enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">
-                        <label for="file">Nama </label>
+                        <label for="name">Nama </label>
                         <input type="text" name="name" id="name" class="form-control"
                             placeholder="Masukan name..." required>
                     </div>
                     <div class="form-group">
-                        <label for="type">Email</label>
-                        <input type="text" name="email" id="emaik" class="form-control"
+                        <label for="email">Email</label>
+                        <input type="text" name="email" id="email" class="form-control"
                             placeholder="Masukan email..." required>
                     </div>
                     <div class="form-group">
